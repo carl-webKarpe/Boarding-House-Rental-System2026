@@ -20,6 +20,13 @@ function initDarkMode() {
 
   const applyMode = (isDark) => {
     root.classList.toggle("dark", isDark);
+    root.setAttribute("data-theme", isDark ? "dark" : "light");
+    document.body.classList.toggle("dark", isDark);
+    document.body.classList.toggle("bg-slate-900", isDark);
+    document.body.classList.toggle("text-slate-100", isDark);
+    document.body.classList.toggle("bg-bgapp", !isDark);
+    document.body.classList.toggle("text-textmain", !isDark);
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
     sunIcon.classList.toggle("hidden", !isDark);
     moonIcon.classList.toggle("hidden", isDark);
     toggleBtn.setAttribute("aria-pressed", String(isDark));
@@ -178,7 +185,7 @@ function initLoginForm() {
   emailInput.addEventListener("blur", () => setFieldError(emailInput, emailError, validateEmail(emailInput.value)));
   passwordInput.addEventListener("blur", () => setFieldError(passwordInput, passwordError, validatePassword(passwordInput.value)));
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const emailMsg = validateEmail(emailInput.value);
@@ -191,32 +198,53 @@ function initLoginForm() {
       return;
     }
 
-    // Remember me
     if (rememberMe.checked) {
       localStorage.setItem("bhrs-remember-email", emailInput.value.trim());
     } else {
       localStorage.removeItem("bhrs-remember-email");
     }
 
-    // Simulate async login request
     loginBtn.disabled = true;
     loginBtnText.classList.add("hidden");
     loginSpinner.classList.remove("hidden");
 
-    setTimeout(() => {
+    try {
+      const response = await fetch("api/login.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailInput.value.trim(),
+          password: passwordInput.value,
+        }),
+      });
+
+      const data = await response.json();
       loginSpinner.classList.add("hidden");
       loginBtnText.classList.remove("hidden");
       loginBtn.disabled = false;
 
-      showToast("Welcome back! Redirecting to your dashboard...", "success");
+      if (!response.ok || !data.success) {
+        showToast(data.message || "Login failed.", "error");
+        return;
+      }
+
+      showToast(`Welcome back, ${data.username}!`, "success");
       form.reset();
-      if (rememberMe.checked) emailInput.value = localStorage.getItem("bhrs-remember-email") || "";
+      if (rememberMe.checked) {
+        emailInput.value = localStorage.getItem("bhrs-remember-email") || "";
+      }
       runValidation();
-      // In a real app: window.location.href = "dashboard.html";
-    }, 1400);
+      setTimeout(() => {
+        window.location.href = "dashboard.php";
+      }, 1000);
+    } catch (error) {
+      loginSpinner.classList.add("hidden");
+      loginBtnText.classList.remove("hidden");
+      loginBtn.disabled = false;
+      showToast("Could not reach the server. Make sure XAMPP Apache and MySQL are running.", "error");
+    }
   });
 
-  // Initial state
   runValidation();
 }
 

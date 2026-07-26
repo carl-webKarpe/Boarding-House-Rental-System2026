@@ -11,6 +11,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Bootstrap 5 (CSS only — loaded before Tailwind so existing Tailwind utility
+       classes and style.css keep visual priority; layout/design is unchanged) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
   <!-- Tailwind CSS (CDN, config extended below) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -62,7 +66,7 @@
     };
   </script>
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="font-body bg-bgapp text-textmain dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen">
@@ -322,6 +326,9 @@
     </section>
   </main>
 
-  <script src="js/app.js"></script>
+  <!-- Bootstrap 5 JS bundle (Popper included) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="app.js"></script>
 </body>
 </html>

@@ -67,11 +67,19 @@ function validateConfirmPassword(password, confirm) {
   return "";
 }
 
-function validateAddress(value) {
-  const trimmed = value.trim();
-  if (!trimmed) return "Current address / location is required.";
-  if (trimmed.length < 10) return "Please enter a more complete address (at least 10 characters).";
+function validateAddress(selectValue, otherValue) {
+  if (!selectValue) return "Please select your current address / location.";
+  if (selectValue === "other") {
+    const trimmed = (otherValue || "").trim();
+    if (!trimmed) return "Please type your address since \"Other\" is selected.";
+    if (trimmed.length < 10) return "Please enter a more complete address (at least 10 characters).";
+  }
   return "";
+}
+
+/** Resolves the actual address string to submit: the picked option, or the typed "Other" value. */
+function resolveAddressValue(selectValue, otherValue) {
+  return selectValue === "other" ? (otherValue || "").trim() : selectValue;
 }
 
 const PH_MOBILE_PATTERN = /^(09\d{9}|\+639\d{9})$/;
@@ -114,6 +122,8 @@ function initSignupForm() {
 
   const address = document.getElementById("address");
   const addressError = document.getElementById("addressError");
+  const addressOtherWrap = document.getElementById("addressOtherWrap");
+  const addressOther = document.getElementById("addressOther");
 
   const contactNumber = document.getElementById("contactNumber");
   const contactNumberError = document.getElementById("contactNumberError");
@@ -156,6 +166,13 @@ function initSignupForm() {
     }, 500);
   }
 
+  /* ---- Address selection: reveal the free-text field only when "Other" is chosen ---- */
+  function syncAddressOtherVisibility() {
+    const isOther = address.value === "other";
+    addressOtherWrap.classList.toggle("hidden", !isOther);
+    if (!isOther) addressOther.value = "";
+  }
+
   /* ---- Password strength meter ---- */
   function renderStrengthMeter() {
     const { label, widthPct, colorClass } = getPasswordStrength(password.value);
@@ -172,7 +189,7 @@ function initSignupForm() {
     const usernameMsg = usernameFormatMsg || usernameTakenCheck;
     const passwordMsg = validateSignupPassword(password.value);
     const confirmMsg = validateConfirmPassword(password.value, confirmPassword.value);
-    const addressMsg = validateAddress(address.value);
+    const addressMsg = validateAddress(address.value, addressOther.value);
     const contactMsg = validateContactNumber(contactNumber.value);
     const termsMsg = validateTerms(terms.checked);
 
@@ -217,7 +234,12 @@ function initSignupForm() {
 
   confirmPassword.addEventListener("input", () => updateFormValidity());
 
-  address.addEventListener("input", () => updateFormValidity());
+  address.addEventListener("change", () => {
+    syncAddressOtherVisibility();
+    updateFormValidity();
+    if (address.value === "other") addressOther.focus();
+  });
+  addressOther.addEventListener("input", () => updateFormValidity());
   contactNumber.addEventListener("input", () => updateFormValidity());
   terms.addEventListener("change", () => {
     if (terms.checked) {
@@ -227,7 +249,7 @@ function initSignupForm() {
     updateFormValidity();
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const isValid = updateFormValidity({ touchAll: true });
 
@@ -240,13 +262,35 @@ function initSignupForm() {
     registerBtnText.classList.add("hidden");
     registerSpinner.classList.remove("hidden");
 
-    // Simulate async account creation
-    setTimeout(() => {
+    try {
+      const response = await fetch("api/register.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gmail: gmail.value.trim(),
+          username: username.value.trim(),
+          password: password.value,
+          confirmPassword: confirmPassword.value,
+          address: resolveAddressValue(address.value, addressOther.value),
+          contactNumber: contactNumber.value.trim(),
+          terms: terms.checked,
+        }),
+      });
+
+      const data = await response.json();
+
       registerSpinner.classList.add("hidden");
       registerBtnText.classList.remove("hidden");
+      registerBtn.disabled = false;
+
+      if (!response.ok || !data.success) {
+        showToast(data.message || "Registration failed.", "error");
+        return;
+      }
 
       showToast("Account created successfully! You may now login.", "success");
       form.reset();
+      syncAddressOtherVisibility();
       strengthTrack.classList.add("hidden");
       strengthLabel.textContent = "";
       usernameStatus.textContent = "";
@@ -255,10 +299,16 @@ function initSignupForm() {
       setTimeout(() => {
         window.location.href = "index.html";
       }, 1600);
-    }, 1400);
+    } catch (error) {
+      registerSpinner.classList.add("hidden");
+      registerBtnText.classList.remove("hidden");
+      registerBtn.disabled = false;
+      showToast("Could not reach the server. Make sure XAMPP Apache and MySQL are running.", "error");
+    }
   });
 
   // Initial state (button stays disabled until the form is valid)
+  syncAddressOtherVisibility();
   registerBtn.disabled = true;
 }
 
@@ -266,8 +316,12 @@ function initSignupForm() {
  * INIT
  * ---------------------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  initDarkMode();
-  initPasswordToggle("togglePassword", "password", "eyeOpen", "eyeClosed");
+  // NOTE: initDarkMode() and the main "password" field's initPasswordToggle()
+  // are already called by app.js's own DOMContentLoaded listener (app.js is
+  // loaded before this file on signup.html). Calling them again here was
+  // binding two click handlers to the same buttons, which made dark mode
+  // (and the password eye-icon) toggle on and immediately back off on every
+  // click. Only initialize what's unique to the signup page here.
   initPasswordToggle("toggleConfirmPassword", "confirmPassword", "eyeOpenConfirm", "eyeClosedConfirm");
   initSignupForm();
 });

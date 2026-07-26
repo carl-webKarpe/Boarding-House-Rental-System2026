@@ -11,6 +11,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Bootstrap 5 (CSS only — loaded before Tailwind so existing Tailwind utility
+       classes and style.css keep visual priority; layout/design is unchanged) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
   <!-- Tailwind CSS (CDN, config extended below — no build step) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -57,7 +61,7 @@
     };
   </script>
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="font-body bg-bgapp text-textmain dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen">
@@ -80,7 +84,7 @@
   <!-- Toast container -->
   <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:bottom-6 sm:top-auto sm:right-6 z-50 flex flex-col gap-3 w-[90%] sm:w-auto max-w-sm" aria-live="polite"></div>
 
-  <main class="min-h-screen w-full flex flex-col lg:flex-row">
+  <main class="min-h-screen w-full flex flex-col lg:flex-row bg-bgapp text-textmain dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
 
     <!-- ============ WELCOME PANEL (top on mobile, right on desktop) ============ -->
     <section
@@ -148,8 +152,8 @@
     </section>
 
     <!-- ============ SIGNUP FORM PANEL ============ -->
-    <section class="order-2 lg:order-1 w-full lg:w-1/2 flex items-center justify-center px-5 sm:px-10 py-10 sm:py-14 lg:py-16">
-      <div class="w-full max-w-md animate-fadeUp" style="animation-delay: 0.08s;">
+    <section class="order-2 lg:order-1 w-full lg:w-1/2 flex items-center justify-center px-5 sm:px-10 py-10 sm:py-14 lg:py-16 bg-bgapp dark:bg-slate-900 transition-colors duration-300 theme-panel">
+      <div class="w-full max-w-md animate-fadeUp theme-card" style="animation-delay: 0.08s;">
 
         <!-- Logo -->
         <div class="flex items-center gap-2 mb-8">
@@ -308,23 +312,47 @@
           <div>
             <label for="address" class="block text-sm font-semibold text-textmain dark:text-slate-200 mb-1.5">Current address / location</label>
             <div class="relative">
-              <span class="absolute top-3 left-0 flex items-start pl-4 text-slate-400" aria-hidden="true">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none" aria-hidden="true">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                 </svg>
               </span>
-              <textarea
+              <select
                 id="address"
                 name="address"
-                rows="3"
-                placeholder="Barangay Catangnan, General Luna, Siargao Island, Surigao del Norte"
                 aria-describedby="addressError"
-                class="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white bg-white text-sm sm:text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary transition-all duration-200 resize-none"
+                class="w-full pl-11 pr-10 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white bg-white text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary transition-all duration-200 appearance-none cursor-pointer"
                 required
-              ></textarea>
+              >
+                <option value="" disabled selected>Select your current address / location</option>
+                <option value="Barangay Catangnan, General Luna, Siargao Island, Surigao del Norte">Barangay Catangnan, General Luna, Siargao Island, Surigao del Norte</option>
+                <option value="Barangay Poblacion, General Luna, Siargao Island, Surigao del Norte">Barangay Poblacion, General Luna, Siargao Island, Surigao del Norte</option>
+                <option value="Barangay Tourism Road, General Luna, Siargao Island, Surigao del Norte">Barangay Tourism Road, General Luna, Siargao Island, Surigao del Norte</option>
+                <option value="Barangay Union, General Luna, Siargao Island, Surigao del Norte">Barangay Union, General Luna, Siargao Island, Surigao del Norte</option>
+                <option value="Barangay Sabang, Del Carmen, Siargao Island, Surigao del Norte">Barangay Sabang, Del Carmen, Siargao Island, Surigao del Norte</option>
+                <option value="Poblacion, Dapa, Surigao del Norte">Poblacion, Dapa, Surigao del Norte</option>
+                <option value="other">Other (not listed)</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 pointer-events-none" aria-hidden="true">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </span>
             </div>
             <p id="addressError" class="hidden text-xs text-red-500 mt-1.5" role="alert"></p>
+
+            <!-- Shown only when "Other (not listed)" is selected above -->
+            <div id="addressOtherWrap" class="hidden mt-2.5">
+              <input
+                type="text"
+                id="addressOther"
+                name="addressOther"
+                placeholder="Type your barangay / municipality / province"
+                aria-describedby="addressError"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white bg-white text-sm sm:text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary transition-all duration-200"
+              />
+            </div>
           </div>
 
           <!-- Contact Number -->
@@ -388,7 +416,10 @@
     </section>
   </main>
 
-  <script src="js/app.js"></script>
-  <script src="js/signup.js"></script>
+  <!-- Bootstrap 5 JS bundle (Popper included) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="app.js"></script>
+  <script src="signup.js"></script>
 </body>
 </html>
