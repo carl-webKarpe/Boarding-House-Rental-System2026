@@ -1,0 +1,135 @@
+/* ==========================================================================
+   Boarding House Rental System — Custom Styles
+   Tailwind CSS handles most utility styling (see index.html / signup.html).
+   This file covers things Tailwind utility classes can't express cleanly:
+   base resets, custom scrollbars, focus rings, and reduced-motion support.
+   ========================================================================== */
+
+/* ---- Base ----
+   NOTE: Tailwind is loaded via the CDN <script> tag in the <head> of each
+   HTML file (see index.html / signup.html) — no build step. Don't add
+   `@import "tailwindcss";` here: that's Tailwind v4 build-pipeline syntax,
+   the browser can't resolve a bare "tailwindcss" import, and it silently
+   breaks every rule below it in this file. This file only holds the small
+   custom styles Tailwind's utility classes can't express on their own.
+*/
+html,
+body {
+  height: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Custom focus ring: consistent, visible keyboard focus everywhere ---- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #16A34A;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ---- Checkbox accent color (older browsers without Tailwind's accent utilities) ---- */
+input[type="checkbox"] {
+  accent-color: #16A34A;
+}
+
+/* ---- Inline field-error helper: swap block/inline-flex via JS, keep layout tidy ---- */
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ---- Password strength meter (used on signup page) ---- */
+.strength-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: #E2E8F0;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 9999px;
+  transition: width 0.35s ease, background-color 0.35s ease;
+}
+
+/* ---- Thin, unobtrusive scrollbar (progressive enhancement) ---- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(16, 163, 74, 0.35);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* ---- Toast entry/exit animation ---- */
+.toast-enter {
+  animation: toastIn 0.3s ease-out both;
+}
+
+.toast-exit {
+  animation: toastOut 0.25s ease-in forwards;
+}
+
+.logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+    .logo {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+/* ---- Respect users who prefer reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
