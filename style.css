@@ -102,6 +102,24 @@ input[type="checkbox"] {
   transition: width 0.35s ease, background-color 0.35s ease;
 }
 
+/* ---- File upload dropzone (used on tenant/landlord verification steps) ---- */
+.dropzone {
+  border: 2px dashed #CBD5E1;
+  border-radius: 20px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.dropzone:hover,
+.dropzone:focus-visible {
+  border-color: #16A34A;
+  background-color: rgba(22, 163, 74, 0.05);
+}
+
+html[data-theme="dark"] .dropzone {
+  border-color: #475569;
+}
+
 /* ---- Thin, unobtrusive scrollbar (progressive enhancement) ---- */
 ::-webkit-scrollbar {
   width: 10px;

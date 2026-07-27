@@ -146,6 +146,161 @@ function validatePassword(value) {
 }
 
 /* ---------------------------------------------------------------------- *
+ * 4b. SHARED FIELD VALIDATORS — first/last name, digits-only numbers,
+ *     date of birth, gender — used by register-tenant.js and
+ *     register-landlord.js.
+ * ---------------------------------------------------------------------- */
+function validateRequired(value, label) {
+  return (value || "").trim() ? "" : `${label} is required.`;
+}
+
+function validateDigitsOnly(value, label = "This field") {
+  const trimmed = (value || "").trim();
+  if (!trimmed) return `${label} is required.`;
+  if (!/^\d+$/.test(trimmed)) return `${label} must contain digits only.`;
+  if (trimmed.length < 10 || trimmed.length > 13) return `${label} must be 10–13 digits long.`;
+  return "";
+}
+
+function validateDateOfBirth(value) {
+  if (!value) return "Date of birth is required.";
+  const dob = new Date(value);
+  if (Number.isNaN(dob.getTime())) return "Please enter a valid date.";
+  const today = new Date();
+  if (dob > today) return "Date of birth cannot be in the future.";
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+  if (age < 16) return "You must be at least 16 years old to register.";
+  if (age > 100) return "Please enter a valid date of birth.";
+  return "";
+}
+
+function validateGender(value) {
+  return value ? "" : "Please select your gender.";
+}
+
+/* ---------------------------------------------------------------------- *
+ * 4c. FILE UPLOAD WIDGET  (shared) — drag & drop, click-to-browse,
+ *     preview with remove, type/size validation. Used for ID/document
+ *     uploads on both the tenant and landlord registration forms.
+ *
+ *     Required markup per field:
+ *       <div id="{dropzoneId}" tabindex="0"> ...instructions... </div>
+ *       <input id="{inputId}" type="file" class="hidden" />
+ *       <div id="{previewId}" class="hidden"></div>
+ *       <p id="{errorId}" class="hidden"></p>
+ * ---------------------------------------------------------------------- */
+const ACCEPTED_DOC_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+
+function initFileUpload({ dropzoneId, inputId, previewId, errorId, maxSizeMB = 5, label = "file" }) {
+  const dropzone = document.getElementById(dropzoneId);
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  const errorEl = document.getElementById(errorId);
+  if (!dropzone || !input || !preview) return null;
+
+  let currentFile = null;
+
+  function humanSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
+  function showError(msg) {
+    if (!errorEl) return;
+    errorEl.textContent = msg ? `⚠ ${msg}` : "";
+    errorEl.className = msg ? "field-error text-xs text-red-500 mt-1.5" : "hidden";
+  }
+
+  function renderPreview() {
+    if (!currentFile) {
+      preview.innerHTML = "";
+      preview.classList.add("hidden");
+      dropzone.classList.remove("hidden");
+      return;
+    }
+    dropzone.classList.add("hidden");
+    preview.classList.remove("hidden");
+
+    const isImage = currentFile.type.startsWith("image/");
+    const thumbHtml = isImage
+      ? `<img src="${URL.createObjectURL(currentFile)}" alt="" class="w-14 h-14 rounded-xl object-cover flex-shrink-0" />`
+      : `<div class="w-14 h-14 rounded-xl bg-primary/10 grid place-items-center flex-shrink-0">
+           <svg class="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+         </div>`;
+
+    preview.innerHTML = `
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3">
+        ${thumbHtml}
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold text-textmain dark:text-white truncate">${currentFile.name}</p>
+          <p class="text-xs text-slate-400">${humanSize(currentFile.size)}</p>
+        </div>
+        <button type="button" data-remove-file aria-label="Remove file" class="flex-shrink-0 w-8 h-8 grid place-items-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+    `;
+    preview.querySelector("[data-remove-file]").addEventListener("click", () => setFile(null));
+  }
+
+  function validateFile(file) {
+    if (!file) return "";
+    if (!ACCEPTED_DOC_TYPES.includes(file.type)) return `Please upload a ${label} as JPG, JPEG, PNG, or PDF.`;
+    if (file.size > maxSizeMB * 1024 * 1024) return `File is too large. Maximum size is ${maxSizeMB}MB.`;
+    return "";
+  }
+
+  function setFile(file) {
+    const msg = validateFile(file);
+    if (msg) {
+      showError(msg);
+      input.value = "";
+      currentFile = null;
+      renderPreview();
+      return;
+    }
+    showError("");
+    currentFile = file;
+    renderPreview();
+  }
+
+  input.addEventListener("change", () => setFile(input.files && input.files[0] ? input.files[0] : null));
+
+  ["dragenter", "dragover"].forEach((evt) =>
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzone.classList.add("border-primary", "bg-primary/5");
+    })
+  );
+  ["dragleave", "drop"].forEach((evt) =>
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("border-primary", "bg-primary/5");
+    })
+  );
+  dropzone.addEventListener("drop", (e) => {
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) setFile(file);
+  });
+  dropzone.addEventListener("click", () => input.click());
+  dropzone.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      input.click();
+    }
+  });
+
+  return {
+    getFile: () => currentFile,
+    isValid: () => !!currentFile,
+    reset: () => setFile(null),
+  };
+}
+
+/* ---------------------------------------------------------------------- *
  * 5. LOGIN FORM (index.html only — safely no-ops elsewhere)
  * ---------------------------------------------------------------------- */
 function initLoginForm() {
