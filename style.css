@@ -1,18 +1,9 @@
 /* ==========================================================================
    Boarding House Rental System — Custom Styles
-   Tailwind CSS handles most utility styling (see index.html / signup.html).
-   This file covers things Tailwind utility classes can't express cleanly:
-   base resets, custom scrollbars, focus rings, and reduced-motion support.
+   Tailwind handles the layout, while this file adds the polish for motion,
+   focus rings, and UI-enhancing effects used across the homepage experience.
    ========================================================================== */
 
-/* ---- Base ----
-   NOTE: Tailwind is loaded via the CDN <script> tag in the <head> of each
-   HTML file (see index.html / signup.html) — no build step. Don't add
-   `@import "tailwindcss";` here: that's Tailwind v4 build-pipeline syntax,
-   the browser can't resolve a bare "tailwindcss" import, and it silently
-   breaks every rule below it in this file. This file only holds the small
-   custom styles Tailwind's utility classes can't express on their own.
-*/
 html,
 body {
   height: 100%;
@@ -42,12 +33,6 @@ html[data-theme="light"] body {
   color: #1e293b;
 }
 
-html[data-theme="dark"] .theme-panel,
-html[data-theme="dark"] .theme-card {
-  background-color: #0f172a;
-  color: #f8fafc;
-}
-
 html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
 html[data-theme="dark"] textarea,
 html[data-theme="dark"] select {
@@ -61,37 +46,72 @@ html[data-theme="dark"] textarea::placeholder {
   color: #94a3b8 !important;
 }
 
-html[data-theme="dark"] .strength-track {
-  background: #334155;
+body::selection {
+  background: rgba(34, 197, 94, 0.28);
 }
 
-/* ---- Custom focus ring: consistent, visible keyboard focus everywhere ---- */
+.shadow-soft {
+  box-shadow: 0 20px 50px -18px rgba(15, 23, 42, 0.16);
+}
+
+.filter-chip {
+  transition: all 0.2s ease;
+}
+
+.filter-chip.active {
+  border-color: #86efac;
+  background-color: #ecfdf5;
+  color: #15803d;
+}
+
+.save-btn.active {
+  color: #ef4444;
+  transform: scale(1.08);
+}
+
+.save-btn.active svg {
+  fill: #ef4444;
+}
+
+.logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .logo {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* ---- Focus ring ---- */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #16A34A;
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #16a34a;
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* ---- Checkbox accent color (older browsers without Tailwind's accent utilities) ---- */
 input[type="checkbox"] {
-  accent-color: #16A34A;
+  accent-color: #16a34a;
 }
 
-/* ---- Inline field-error helper: swap block/inline-flex via JS, keep layout tidy ---- */
 .field-error {
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
 
-/* ---- Password strength meter (used on signup page) ---- */
 .strength-track {
   height: 6px;
   border-radius: 9999px;
-  background: #E2E8F0;
+  background: #e2e8f0;
   overflow: hidden;
 }
 
@@ -102,9 +122,8 @@ input[type="checkbox"] {
   transition: width 0.35s ease, background-color 0.35s ease;
 }
 
-/* ---- File upload dropzone (used on tenant/landlord verification steps) ---- */
 .dropzone {
-  border: 2px dashed #CBD5E1;
+  border: 2px dashed #cbd5e1;
   border-radius: 20px;
   transition: border-color 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
@@ -112,7 +131,7 @@ input[type="checkbox"] {
 
 .dropzone:hover,
 .dropzone:focus-visible {
-  border-color: #16A34A;
+  border-color: #16a34a;
   background-color: rgba(22, 163, 74, 0.05);
 }
 
@@ -120,7 +139,6 @@ html[data-theme="dark"] .dropzone {
   border-color: #475569;
 }
 
-/* ---- Thin, unobtrusive scrollbar (progressive enhancement) ---- */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -137,27 +155,12 @@ html[data-theme="dark"] .dropzone {
   background-clip: content-box;
 }
 
-/* ---- Toast entry/exit animation ---- */
 .toast-enter {
   animation: toastIn 0.3s ease-out both;
 }
 
 .toast-exit {
   animation: toastOut 0.25s ease-in forwards;
-}
-
-.logo {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-@media (min-width: 640px) {
-    .logo {
-        width: 120px;
-        height: 120px;
-    }
 }
 
 @keyframes toastIn {
@@ -182,7 +185,6 @@ html[data-theme="dark"] .dropzone {
   }
 }
 
-/* ---- Respect users who prefer reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

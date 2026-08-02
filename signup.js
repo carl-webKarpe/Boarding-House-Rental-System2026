@@ -100,6 +100,16 @@ function validateTerms(checked) {
 /* ---------------------------------------------------------------------- *
  * Form wiring
  * ---------------------------------------------------------------------- */
+async function getCsrfToken() {
+  try {
+    const response = await fetch("api/csrf.php", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    const data = await response.json();
+    return data.csrf_token || "";
+  } catch (error) {
+    return "";
+  }
+}
+
 function initSignupForm() {
   const form = document.getElementById("signupForm");
   if (!form) return;
@@ -263,6 +273,15 @@ function initSignupForm() {
     registerSpinner.classList.remove("hidden");
 
     try {
+      const csrfToken = await getCsrfToken();
+      if (!csrfToken) {
+        showToast("Security token could not be prepared. Please refresh the page.", "error");
+        registerSpinner.classList.add("hidden");
+        registerBtnText.classList.remove("hidden");
+        registerBtn.disabled = false;
+        return;
+      }
+
       const response = await fetch("api/register.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -274,6 +293,7 @@ function initSignupForm() {
           address: resolveAddressValue(address.value, addressOther.value),
           contactNumber: contactNumber.value.trim(),
           terms: terms.checked,
+          csrf_token: csrfToken,
         }),
       });
 

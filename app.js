@@ -1,16 +1,10 @@
 /* ==========================================================================
    Boarding House Rental System — app.js
-   Shared, reusable utilities used by BOTH index.html (login) and
-   signup.html (registration). Page-specific form logic lives in its own
-   file: the login form wiring below, and js/signup.js for registration.
-   No external dependencies.
+   Shared UI behavior for the login flow and the modern homepage experience.
    ========================================================================== */
 
 "use strict";
 
-/* ---------------------------------------------------------------------- *
- * 1. DARK MODE  (shared)
- * ---------------------------------------------------------------------- */
 function initDarkMode() {
   const root = document.documentElement;
   const toggleBtn = document.getElementById("darkModeToggle");
@@ -22,10 +16,6 @@ function initDarkMode() {
     root.classList.toggle("dark", isDark);
     root.setAttribute("data-theme", isDark ? "dark" : "light");
     document.body.classList.toggle("dark", isDark);
-    document.body.classList.toggle("bg-slate-900", isDark);
-    document.body.classList.toggle("text-slate-100", isDark);
-    document.body.classList.toggle("bg-bgapp", !isDark);
-    document.body.classList.toggle("text-textmain", !isDark);
     document.documentElement.style.colorScheme = isDark ? "dark" : "light";
     sunIcon.classList.toggle("hidden", !isDark);
     moonIcon.classList.toggle("hidden", isDark);
@@ -43,9 +33,6 @@ function initDarkMode() {
   });
 }
 
-/* ---------------------------------------------------------------------- *
- * 2. TOAST NOTIFICATIONS  (shared)
- * ---------------------------------------------------------------------- */
 function showToast(message, type = "success") {
   const container = document.getElementById("toastContainer");
   if (!container) return;
@@ -68,7 +55,6 @@ function showToast(message, type = "success") {
   `;
 
   container.appendChild(toast);
-
   setTimeout(() => {
     toast.classList.remove("toast-enter");
     toast.classList.add("toast-exit");
@@ -76,9 +62,6 @@ function showToast(message, type = "success") {
   }, 3500);
 }
 
-/* ---------------------------------------------------------------------- *
- * 3. PASSWORD VISIBILITY TOGGLE  (shared, generalized for multiple fields)
- * ---------------------------------------------------------------------- */
 function initPasswordToggle(toggleId, inputId, eyeOpenId, eyeClosedId) {
   const toggleBtn = document.getElementById(toggleId);
   const input = document.getElementById(inputId);
@@ -96,15 +79,8 @@ function initPasswordToggle(toggleId, inputId, eyeOpenId, eyeClosedId) {
   });
 }
 
-/* ---------------------------------------------------------------------- *
- * 4. VALIDATION HELPERS  (shared)
- * ---------------------------------------------------------------------- */
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * Toggle an error message under a field, and matching red/normal input styles.
- * Pass an empty string / falsy message to clear the error.
- */
 function setFieldError(inputEl, errorEl, message) {
   if (!inputEl || !errorEl) return;
 
@@ -123,16 +99,6 @@ function setFieldError(inputEl, errorEl, message) {
   }
 }
 
-/** Show a positive confirmation message (e.g. "✓ Passwords matched") under a field. */
-function setFieldSuccess(inputEl, errorEl, message) {
-  if (!inputEl || !errorEl) return;
-  inputEl.classList.remove("border-red-400", "focus:ring-red-300", "focus:border-red-400");
-  inputEl.classList.add("border-emerald-400");
-  inputEl.setAttribute("aria-invalid", "false");
-  errorEl.textContent = `✓ ${message}`;
-  errorEl.className = "field-error text-xs text-emerald-600 mt-1.5";
-}
-
 function validateEmail(value) {
   if (!value.trim()) return "Email is required.";
   if (!EMAIL_PATTERN.test(value.trim())) return "Please enter a valid email address.";
@@ -145,52 +111,6 @@ function validatePassword(value) {
   return "";
 }
 
-/* ---------------------------------------------------------------------- *
- * 4b. SHARED FIELD VALIDATORS — first/last name, digits-only numbers,
- *     date of birth, gender — used by register-tenant.js and
- *     register-landlord.js.
- * ---------------------------------------------------------------------- */
-function validateRequired(value, label) {
-  return (value || "").trim() ? "" : `${label} is required.`;
-}
-
-function validateDigitsOnly(value, label = "This field") {
-  const trimmed = (value || "").trim();
-  if (!trimmed) return `${label} is required.`;
-  if (!/^\d+$/.test(trimmed)) return `${label} must contain digits only.`;
-  if (trimmed.length < 10 || trimmed.length > 13) return `${label} must be 10–13 digits long.`;
-  return "";
-}
-
-function validateDateOfBirth(value) {
-  if (!value) return "Date of birth is required.";
-  const dob = new Date(value);
-  if (Number.isNaN(dob.getTime())) return "Please enter a valid date.";
-  const today = new Date();
-  if (dob > today) return "Date of birth cannot be in the future.";
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
-  if (age < 16) return "You must be at least 16 years old to register.";
-  if (age > 100) return "Please enter a valid date of birth.";
-  return "";
-}
-
-function validateGender(value) {
-  return value ? "" : "Please select your gender.";
-}
-
-/* ---------------------------------------------------------------------- *
- * 4c. FILE UPLOAD WIDGET  (shared) — drag & drop, click-to-browse,
- *     preview with remove, type/size validation. Used for ID/document
- *     uploads on both the tenant and landlord registration forms.
- *
- *     Required markup per field:
- *       <div id="{dropzoneId}" tabindex="0"> ...instructions... </div>
- *       <input id="{inputId}" type="file" class="hidden" />
- *       <div id="{previewId}" class="hidden"></div>
- *       <p id="{errorId}" class="hidden"></p>
- * ---------------------------------------------------------------------- */
 const ACCEPTED_DOC_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 
 function initFileUpload({ dropzoneId, inputId, previewId, errorId, maxSizeMB = 5, label = "file" }) {
@@ -227,9 +147,7 @@ function initFileUpload({ dropzoneId, inputId, previewId, errorId, maxSizeMB = 5
     const isImage = currentFile.type.startsWith("image/");
     const thumbHtml = isImage
       ? `<img src="${URL.createObjectURL(currentFile)}" alt="" class="w-14 h-14 rounded-xl object-cover flex-shrink-0" />`
-      : `<div class="w-14 h-14 rounded-xl bg-primary/10 grid place-items-center flex-shrink-0">
-           <svg class="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-         </div>`;
+      : `<div class="w-14 h-14 rounded-xl bg-primary/10 grid place-items-center flex-shrink-0"><svg class="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg></div>`;
 
     preview.innerHTML = `
       <div class="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3">
@@ -269,18 +187,14 @@ function initFileUpload({ dropzoneId, inputId, previewId, errorId, maxSizeMB = 5
 
   input.addEventListener("change", () => setFile(input.files && input.files[0] ? input.files[0] : null));
 
-  ["dragenter", "dragover"].forEach((evt) =>
-    dropzone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      dropzone.classList.add("border-primary", "bg-primary/5");
-    })
-  );
-  ["dragleave", "drop"].forEach((evt) =>
-    dropzone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      dropzone.classList.remove("border-primary", "bg-primary/5");
-    })
-  );
+  ["dragenter", "dragover"].forEach((evt) => dropzone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    dropzone.classList.add("border-primary", "bg-primary/5");
+  }));
+  ["dragleave", "drop"].forEach((evt) => dropzone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("border-primary", "bg-primary/5");
+  }));
   dropzone.addEventListener("drop", (e) => {
     const file = e.dataTransfer.files && e.dataTransfer.files[0];
     if (file) setFile(file);
@@ -300,9 +214,16 @@ function initFileUpload({ dropzoneId, inputId, previewId, errorId, maxSizeMB = 5
   };
 }
 
-/* ---------------------------------------------------------------------- *
- * 5. LOGIN FORM (index.html only — safely no-ops elsewhere)
- * ---------------------------------------------------------------------- */
+async function getCsrfToken() {
+  try {
+    const response = await fetch("api/csrf.php", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    const data = await response.json();
+    return data.csrf_token || "";
+  } catch (error) {
+    return "";
+  }
+}
+
 function initLoginForm() {
   const form = document.getElementById("loginForm");
   if (!form) return;
@@ -316,7 +237,6 @@ function initLoginForm() {
   const loginBtnText = document.getElementById("loginBtnText");
   const loginSpinner = document.getElementById("loginSpinner");
 
-  // Restore remembered email
   const rememberedEmail = localStorage.getItem("bhrs-remember-email");
   if (rememberedEmail) {
     emailInput.value = rememberedEmail;
@@ -326,10 +246,8 @@ function initLoginForm() {
   const runValidation = () => {
     const emailMsg = validateEmail(emailInput.value);
     const passwordMsg = validatePassword(passwordInput.value);
-
     setFieldError(emailInput, emailError, emailInput.value ? emailMsg : "");
     setFieldError(passwordInput, passwordError, passwordInput.value ? passwordMsg : "");
-
     const isValid = !emailMsg && !passwordMsg;
     loginBtn.disabled = !isValid;
     return isValid;
@@ -364,12 +282,22 @@ function initLoginForm() {
     loginSpinner.classList.remove("hidden");
 
     try {
+      const csrfToken = await getCsrfToken();
+      if (!csrfToken) {
+        showToast("Security token could not be prepared. Please refresh the page.", "error");
+        loginSpinner.classList.add("hidden");
+        loginBtnText.classList.remove("hidden");
+        loginBtn.disabled = false;
+        return;
+      }
+
       const response = await fetch("api/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: emailInput.value.trim(),
           password: passwordInput.value,
+          csrf_token: csrfToken,
         }),
       });
 
@@ -377,7 +305,6 @@ function initLoginForm() {
       loginSpinner.classList.add("hidden");
       loginBtnText.classList.remove("hidden");
       loginBtn.disabled = false;
-
       if (!response.ok || !data.success) {
         showToast(data.message || "Login failed.", "error");
         return;
@@ -390,7 +317,7 @@ function initLoginForm() {
       }
       runValidation();
       setTimeout(() => {
-        window.location.href = "dashboard.php";
+        window.location.href = "browse-rooms.php";
       }, 1000);
     } catch (error) {
       loginSpinner.classList.add("hidden");
@@ -403,11 +330,184 @@ function initLoginForm() {
   runValidation();
 }
 
-/* ---------------------------------------------------------------------- *
- * 6. INIT
- * ---------------------------------------------------------------------- */
+function initHomepageExperience() {
+  const profileMenuButton = document.getElementById("profileMenuButton");
+  const profileDropdown = document.getElementById("profileDropdown");
+  if (profileMenuButton && profileDropdown) {
+    profileMenuButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      profileDropdown.classList.toggle("hidden");
+    });
+    document.addEventListener("click", () => profileDropdown.classList.add("hidden"));
+  }
+
+  const heroSlides = Array.from(document.querySelectorAll("[data-hero-slide]"));
+  if (heroSlides.length) {
+    let slideIndex = 0;
+    setInterval(() => {
+      heroSlides.forEach((slide, index) => slide.classList.toggle("hidden", index !== slideIndex));
+      slideIndex = (slideIndex + 1) % heroSlides.length;
+    }, 5000);
+  }
+
+  const searchForm = document.getElementById("searchForm");
+  if (searchForm) {
+    searchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(searchForm);
+      const values = Array.from(formData.values()).filter(Boolean).join(" ").trim();
+      if (!values) {
+        showToast("Enter a location or school to start searching.", "info");
+        return;
+      }
+      showToast("Filtering homes to match your search.", "success");
+    });
+  }
+
+  const globalSearch = document.getElementById("globalSearch");
+  const cards = Array.from(document.querySelectorAll("[data-room-card]"));
+  const filterChips = Array.from(document.querySelectorAll("[data-filter-chip]"));
+  let activeFilter = "all";
+
+  const updateCards = (query = "", filter = activeFilter) => {
+    const normalizedQuery = query.trim().toLowerCase();
+    cards.forEach((card) => {
+      const title = card.getAttribute("data-title") || "";
+      const location = card.getAttribute("data-location") || "";
+      const amenities = card.getAttribute("data-amenities") || "";
+      const type = card.getAttribute("data-type") || "";
+      const price = Number(card.getAttribute("data-price") || 0);
+      const matchesQuery = !normalizedQuery || `${title} ${location} ${amenities}`.toLowerCase().includes(normalizedQuery);
+      const matchesFilter = filter === "all"
+        || (filter === "shared" && type.includes("shared"))
+        || (filter === "solo" && type.includes("solo"))
+        || (filter === "budget" && price <= 3500)
+        || (filter === "verified");
+      card.style.display = matchesQuery && matchesFilter ? "block" : "none";
+    });
+  };
+
+  if (globalSearch) {
+    globalSearch.addEventListener("input", (event) => updateCards(event.target.value));
+  }
+
+  filterChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      activeFilter = chip.getAttribute("data-filter-chip") || "all";
+      filterChips.forEach((item) => item.classList.toggle("active", item === chip));
+      updateCards(globalSearch ? globalSearch.value : "", activeFilter);
+    });
+  });
+
+  const saveButtons = document.querySelectorAll("[data-save-room]");
+  saveButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      button.classList.toggle("active");
+      const isSaved = button.classList.contains("active");
+      showToast(isSaved ? "Property saved to favorites." : "Removed from favorites.", "info");
+    });
+  });
+
+  const bookingModal = document.getElementById("bookingModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  const cancelModalBtn = document.getElementById("cancelModalBtn");
+  const bookButtons = document.querySelectorAll("[data-book-room]");
+
+  const openModal = (title) => {
+    if (!bookingModal || !modalTitle || !modalBody) return;
+    modalTitle.textContent = title;
+    modalBody.innerHTML = '<p class="mb-2">A landlord will review your request and contact you shortly.</p><p class="text-sm text-slate-500">You can also message them directly from the dashboard after confirmation.</p>';
+    bookingModal.classList.remove("hidden");
+    bookingModal.classList.add("flex");
+  };
+
+  const closeModal = () => {
+    if (!bookingModal) return;
+    bookingModal.classList.add("hidden");
+    bookingModal.classList.remove("flex");
+  };
+
+  bookButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const title = button.closest("article")?.querySelector("h3")?.textContent || "This property";
+      openModal(title);
+    });
+  });
+
+  [closeModalBtn, cancelModalBtn].forEach((button) => {
+    if (button) button.addEventListener("click", closeModal);
+  });
+  if (bookingModal) {
+    bookingModal.addEventListener("click", (event) => {
+      if (event.target === bookingModal) closeModal();
+    });
+  }
+
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+  const loadMoreStatus = document.getElementById("loadMoreStatus");
+  if (loadMoreBtn && loadMoreStatus) {
+    loadMoreBtn.addEventListener("click", async () => {
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.textContent = "Loading...";
+      try {
+        const response = await fetch("api/rooms.php?offset=3&limit=2", { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const data = await response.json();
+        if (data.rooms && data.rooms.length) {
+          const fragment = document.createDocumentFragment();
+          data.rooms.forEach((room) => {
+            const article = document.createElement("article");
+            article.className = "group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-soft dark:border-slate-800 dark:bg-slate-900/80";
+            article.innerHTML = `
+              <div class="relative">
+                <img src="${room.image}" alt="${room.title}" class="h-56 w-full object-cover" loading="lazy" />
+                <span class="absolute left-4 top-4 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">${room.badge}</span>
+              </div>
+              <div class="p-5">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 class="font-display text-lg font-semibold text-slate-900 dark:text-white">${room.title}</h3>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${room.barangay}, ${room.city}</p>
+                  </div>
+                  <div class="rounded-full bg-amber-50 px-2.5 py-1 text-sm font-semibold text-amber-600 dark:bg-amber-950/40">★ ${room.rating.toFixed(1)}</div>
+                </div>
+                <div class="mt-4 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+                  <span>${room.type}</span>
+                  <span>${room.distance} from school</span>
+                </div>
+                <div class="mt-5 flex items-center justify-between">
+                  <div>
+                    <div class="text-lg font-semibold text-slate-900 dark:text-white">₱${room.rent.toLocaleString()}</div>
+                    <div class="text-sm text-slate-500 dark:text-slate-400">/ month</div>
+                  </div>
+                  <button type="button" class="rounded-full bg-emerald-600 px-3 py-2 text-sm font-semibold text-white" data-book-room="${room.id}">Book</button>
+                </div>
+              </div>`;
+            fragment.appendChild(article);
+          });
+          const grid = document.querySelector("#listings .grid");
+          if (grid) grid.appendChild(fragment);
+        }
+        if (!data.hasMore) {
+          loadMoreBtn.classList.add("hidden");
+          loadMoreStatus.textContent = "You’ve reached the latest listings.";
+        } else {
+          loadMoreStatus.textContent = "More homes are available for you to explore.";
+        }
+      } catch (error) {
+        showToast("We could not load more listings right now.", "error");
+      } finally {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = "Load more listings";
+      }
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initDarkMode();
   initPasswordToggle("togglePassword", "password", "eyeOpen", "eyeClosed");
   initLoginForm();
+  initHomepageExperience();
 });

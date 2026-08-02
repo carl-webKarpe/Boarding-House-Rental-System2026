@@ -290,6 +290,16 @@ function initLandlordForm() {
       formData.append("terms", terms.checked);
       formData.append("privacy", privacy.checked);
 
+      const csrfToken = await getCsrfToken();
+      if (!csrfToken) {
+        showToast("Security token could not be prepared. Please refresh the page.", "error");
+        registerSpinner.classList.add("hidden");
+        registerBtnText.classList.remove("hidden");
+        registerBtn.disabled = false;
+        return;
+      }
+      formData.append('csrf_token', csrfToken);
+
       const response = await fetch("api/register-landlord.php", { method: "POST", body: formData });
       const data = await response.json();
 
