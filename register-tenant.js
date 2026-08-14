@@ -285,7 +285,7 @@ function initTenantForm() {
       strengthLabel.textContent = "";
 
       setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.href = "loginform.html";
       }, 1800);
     } catch (error) {
       registerSpinner.classList.add("hidden");

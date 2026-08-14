@@ -10,5 +10,5 @@ if (!empty($_SESSION['user_id'])) {
     auditLog('logout', 'User logged out', (int) $_SESSION['user_id']);
 }
 logoutUser();
-header('Location: /index.html');
+header('Location: /loginform.html');
 exit;

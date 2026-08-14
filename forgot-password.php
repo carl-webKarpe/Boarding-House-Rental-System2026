@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </form>
 
           <div class="mt-3 text-center">
-            <a href="index.html" class="text-decoration-none fw-semibold">Back to login</a>
+            <a href="loginform.html" class="text-decoration-none fw-semibold">Back to login</a>
           </div>
         </div>
       </div>

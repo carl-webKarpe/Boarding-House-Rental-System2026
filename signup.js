@@ -317,7 +317,7 @@ function initSignupForm() {
       usernameTakenCheck = "";
 
       setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.href = "loginform.html";
       }, 1600);
     } catch (error) {
       registerSpinner.classList.add("hidden");

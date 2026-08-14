@@ -322,7 +322,7 @@ function initLandlordForm() {
       strengthLabel.textContent = "";
 
       setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.href = "loginform.html";
       }, 2400);
     } catch (error) {
       registerSpinner.classList.add("hidden");
