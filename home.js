@@ -7,12 +7,18 @@
 "use strict";
 
 /* ---------------------------------------------------------------------- *
+<<<<<<< HEAD
  * Real listings data — fetched from the backend API
  * ---------------------------------------------------------------------- */
 let LISTINGS = [];
 
 // Fallback sample data if API fails
 const FALLBACK_LISTINGS = [
+=======
+ * Sample listings data — replace with real data from the database later.
+ * ---------------------------------------------------------------------- */
+const LISTINGS = [
+>>>>>>> b469827efb67717f5ef67d07fed9cd75f721d325
   {
     id: "greenview",
     name: "Green View Boarding House",
@@ -59,6 +65,7 @@ const FALLBACK_LISTINGS = [
   },
 ];
 
+<<<<<<< HEAD
 /**
  * Fetch listings from the API
  */
@@ -85,6 +92,8 @@ async function fetchListings() {
   }
 }
 
+=======
+>>>>>>> b469827efb67717f5ef67d07fed9cd75f721d325
 /* ---------------------------------------------------------------------- *
  * Listings rendering + filtering
  * ---------------------------------------------------------------------- */
@@ -171,7 +180,11 @@ function openListingModal(id) {
       <dt>Rooms Open</dt><dd>${item.rooms}</dd>
       <dt>Amenities</dt><dd>${item.amenities.join(", ")}</dd>
     </dl>
+<<<<<<< HEAD
     <a href="index.html" class="btn btn--dark" style="margin-top:22px;width:100%;">Reserve This Room</a>
+=======
+    <a href="account-type.html" class="btn btn--dark" style="margin-top:22px;width:100%;">Reserve This Room</a>
+>>>>>>> b469827efb67717f5ef67d07fed9cd75f721d325
   `;
 
   overlay.classList.add("is-open");
@@ -290,13 +303,20 @@ function initStatCounters() {
 /* ---------------------------------------------------------------------- *
  * INIT
  * ---------------------------------------------------------------------- */
+<<<<<<< HEAD
 document.addEventListener("DOMContentLoaded", async () => {
+=======
+document.addEventListener("DOMContentLoaded", () => {
+>>>>>>> b469827efb67717f5ef67d07fed9cd75f721d325
   initNavbar();
   initScrollReveal();
   initStatCounters();
 
+<<<<<<< HEAD
   // Fetch listings from API, with fallback to sample data
   await fetchListings();
+=======
+>>>>>>> b469827efb67717f5ef67d07fed9cd75f721d325
   renderListings(LISTINGS);
 
   document.getElementById("searchForm").addEventListener("submit", (e) => {
