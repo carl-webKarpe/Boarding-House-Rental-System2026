@@ -297,6 +297,7 @@ function initLoginForm() {
         body: JSON.stringify({
           email: emailInput.value.trim(),
           password: passwordInput.value,
+          rememberMe: rememberMe.checked,
           csrf_token: csrfToken,
         }),
       });
