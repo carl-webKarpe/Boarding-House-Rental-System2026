@@ -13,7 +13,7 @@ const LISTINGS = [
   {
     id: "greenview",
     name: "Green View Boarding House",
-    location: "DAPA, Siargao",
+    location: "Dapa, Siargao",
     price: 1500,
     roomType: "Single Room",
     availability: "Available",
@@ -35,24 +35,24 @@ const LISTINGS = [
   {
     id: "studenthaven",
     name: "Student Haven",
-    location: "General Luna, Siargao",
+    location: "Dapa, Siargao",
     price: 5000,
     roomType: "Single Room",
     availability: "Available",
     rooms: 4,
     amenities: ["Wi-Fi", "Private Bathroom", "Study Area"],
-    img: "https://picsum.photos/seed/studenthaven/480/360",
+    img: "haven.jpg",
   },
   {
     id: "sunrise",
-    name: "Sunrise Bedspace Inn",
-    location: "Del Carmen, Siargao",
+    name: "Boarding House Sunrise",
+    location: "Dapa, Siargao",
     price: 2000,
     roomType: "Bedspace",
     availability: "Coming Soon",
     rooms: 12,
     amenities: ["Wi-Fi", "Shared Kitchen", "Electric Fan"],
-    img: "https://picsum.photos/seed/sunrise/480/360",
+    img: "images.jpg",
   },
 ];
 
