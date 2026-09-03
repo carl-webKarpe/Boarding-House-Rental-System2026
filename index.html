@@ -11,6 +11,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
 <link rel="stylesheet" href="home.css" />
 </head>
 <body>
@@ -28,6 +30,7 @@
     <nav class="navbar__links" id="navLinks">
       <a href="#top" class="navlink is-active">Home</a>
       <a href="#listings" class="navlink">Boarding Houses</a>
+      <a href="#siit-map" class="navlink">Near SIIT</a>
       <a href="#how-it-works" class="navlink">How It Works</a>
       <a href="#about" class="navlink">About Us</a>
       <a href="#footer" class="navlink">Contact</a>
@@ -181,15 +184,15 @@
       </article>
     </div>
   </section>
-
+ 
   <!-- ============================================================
        ABOUT / SYSTEM INTRODUCTION SECTION
   ============================================================ -->
   <section class="about" id="about">
     <div class="about__media reveal" aria-hidden="true">
-      <img class="about__img about__img--main" src="https://picsum.photos/seed/bh-main/560/640" alt="" loading="lazy" />
-      <img class="about__img about__img--sm about__img--sm1" src="https://picsum.photos/seed/bh-small1/300/220" alt="" loading="lazy" />
-      <img class="about__img about__img--sm about__img--sm2" src="https://picsum.photos/seed/bh-small2/260/200" alt="" loading="lazy" />
+      <img class="about__img about__img--main" src="BGINFO.jpg" alt="" loading="lazy" />
+      <img class="about__img about__img--sm about__img--sm1" src="BGINFO1.png" alt="" loading="lazy" />
+      <img class="about__img about__img--sm about__img--sm2" src="BGINFO3.png" alt="" loading="lazy" />
     </div>
 
     <div class="about__copy reveal">
@@ -232,6 +235,39 @@
 
     <div class="listings__grid" id="listingsGrid"><!-- cards injected by home.js --></div>
     <p class="listings__empty hidden" id="listingsEmpty">No boarding houses match your search. Try adjusting your filters.</p>
+  </section>
+
+  <!-- ============================================================
+       SIIT LOCATION FINDER — interactive map centered on SIIT
+  ============================================================ -->
+  <section class="siit-map-section" id="siit-map">
+    <div class="section-head reveal">
+      <span class="eyebrow eyebrow--dark">LOCATION FINDER</span>
+      <h2>Boarding Houses Near SIIT</h2>
+      <p class="section-head__sub">
+        Every listing plotted around Siargao Island Institute of Technology &mdash; closest properties first.
+      </p>
+    </div>
+
+    <div class="siit-map__filters reveal">
+      <button type="button" class="chip chip--active" data-radius="all">All Nearby</button>
+      <button type="button" class="chip" data-radius="near">Near SIIT</button>
+      <button type="button" class="chip" data-radius="200">Within 200 m</button>
+      <button type="button" class="chip" data-radius="210">Within 210 m</button>
+      <button type="button" class="chip" data-radius="250">Within 250 m</button>
+      <button type="button" class="chip" data-radius="350">Within 350 m</button>
+    </div>
+
+    <div class="siit-map__layout reveal">
+      <div class="siit-map__list" id="siitMapList"><!-- cards injected by home.js --></div>
+      <div class="siit-map__panel">
+        <div id="siitMap" class="siit-map__canvas" aria-label="Map of boarding houses near SIIT"></div>
+        <p class="siit-map__legend">
+          <span><span class="dot dot--school"></span>SIIT (reference point)</span>
+          <span><span class="dot dot--property"></span>Boarding house</span>
+        </p>
+      </div>
+    </div>
   </section>
 
   <!-- ============================================================
@@ -363,6 +399,7 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="script.js"></script>
 </body>
 </html>
