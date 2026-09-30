@@ -247,7 +247,7 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
                 <div class="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-800">
                   <img src="<?php echo sanitizeForOutput($room['image']); ?>" alt="<?php echo sanitizeForOutput($room['title']); ?>" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   <span class="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white"><?php echo sanitizeForOutput($room['badge']); ?></span>
-                  <button type="button" class="save-btn absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm transition hover:scale-110 dark:bg-slate-900/90 dark:text-slate-200" aria-label="Save listing">
+                  <button type="button" data-save-room class="save-btn absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm transition hover:scale-110 dark:bg-slate-900/90 dark:text-slate-200" aria-label="Save listing">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 6.75A2.25 2.25 0 0 1 6.75 4.5H17.25A2.25 2.25 0 0 1 19.5 6.75V19.5l-7.5-4.5-7.5 4.5V6.75Z" /></svg>
                   </button>
                 </div>

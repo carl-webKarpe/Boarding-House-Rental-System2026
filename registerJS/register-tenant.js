@@ -44,6 +44,7 @@ function validateSignupPassword(value) {
   if (!c.length) return "Password must be at least 8 characters.";
   if (!c.upper || !c.lower) return "Password needs both uppercase and lowercase letters.";
   if (!c.number) return "Password needs at least one number.";
+  if (!c.special) return "Password needs at least one special character.";
   return "";
 }
 

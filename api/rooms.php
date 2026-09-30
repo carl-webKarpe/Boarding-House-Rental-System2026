@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../security/security_headers.php';
 require_once __DIR__ . '/../security/session.php';
-require_once __DIR__ . '/../room-data.php';
+require_once __DIR__ . '/../php/room-data.php';
 
 applySecurityHeaders();
 startSecureSession();
