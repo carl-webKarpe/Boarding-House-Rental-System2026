@@ -40,7 +40,7 @@ try {
           <h1 class="h3 mb-1">User Management</h1>
           <p class="text-muted mb-0">Manage access for staff, admins, and regular users.</p>
         </div>
-        <a href="../dashboard.php" class="btn btn-outline-secondary">Back to dashboard</a>
+        <a href="../php/dashboard.php" class="btn btn-outline-secondary">Back to dashboard</a>
       </div>
 
       <?php if ($message !== ''): ?><div class="alert alert-success"><?php echo sanitizeForOutput($message); ?></div><?php endif; ?>

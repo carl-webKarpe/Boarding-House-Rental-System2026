@@ -50,7 +50,7 @@ const LISTINGS = [
     rooms: 5,
     amenities: ["Wi-Fi", "Kitchen", "Water", "Laundry"],
     coordinates: [9.7602, 126.0495],
-    img: "image2.jpg",
+    img: "../Image/image2.jpg",
   },
   {
     id: "studenthaven",
@@ -62,7 +62,7 @@ const LISTINGS = [
     rooms: 4,
     amenities: ["Wi-Fi", "Private Bathroom", "Study Area"],
     coordinates: [9.7612, 126.0493],
-    img: "haven.jpg",
+    img: "../Image/haven.jpg",
   },
   {
     id: "northview",
@@ -74,7 +74,7 @@ const LISTINGS = [
     rooms: 8,
     amenities: ["Wi-Fi", "Kitchen", "Study Area", "Security Guard"],
     coordinates: [9.7618, 126.0500],
-    img: "image4.jpg",
+    img: "../Image/image4.jpg",
   },
   {
     id: "sunrise",
@@ -86,7 +86,7 @@ const LISTINGS = [
     rooms: 12,
     amenities: ["Wi-Fi", "Shared Kitchen", "Electric Fan"],
     coordinates: [9.7598, 126.0492],
-    img: "images.jpg",
+    img: "../Image/images.jpg",
   },
   {
     id: "seaside",
@@ -98,7 +98,7 @@ const LISTINGS = [
     rooms: 10,
     amenities: ["Wi-Fi", "Shared Kitchen", "Water"],
     coordinates: [9.7605, 126.0500],
-    img: "image3.jpg",
+    img: "../Image/image3.jpg",
   },
 ];
 
@@ -259,7 +259,7 @@ function openListingModal(id) {
         <ul class="modal__amenity-list">${amenitiesHTML}</ul>
       </div>
 
-      <a href="account-type.html" class="btn btn--dark modal__cta">Reserve This Room</a>
+      <a href="../html/loginform.html" class="btn btn--dark modal__cta">Reserve This Room</a>
     </div>
   `;
 

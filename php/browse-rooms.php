@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/security/security_headers.php';
-require_once __DIR__ . '/security/session.php';
-require_once __DIR__ . '/security/sanitize.php';
+require_once __DIR__ . '/../security/security_headers.php';
+require_once __DIR__ . '/../security/session.php';
+require_once __DIR__ . '/../security/sanitize.php';
 require_once __DIR__ . '/room-data.php';
 
 applySecurityHeaders();
@@ -42,7 +42,7 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
       }
     };
   </script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="min-h-screen bg-slate-50 font-body text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
   <button id="darkModeToggle" type="button" class="fixed right-4 top-4 z-50 grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-soft backdrop-blur transition hover:border-emerald-300 hover:text-emerald-600 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-200">
@@ -292,7 +292,7 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
               <p class="text-xs font-semibold uppercase text-emerald-600">Ready to book?</p>
               <h2 class="mt-1 font-display text-xl font-bold text-slate-900 dark:text-white">Find your perfect boarding house today</h2>
             </div>
-            <a href="account-type.html" class="inline-flex rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">Create account</a>
+            <a href="../html/account-type.html" class="inline-flex rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">Create account</a>
           </div>
           <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Save favorites, message landlords, and book instantly.</p>
         </section>
@@ -300,6 +300,6 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
     </div>
   </main>
 
-  <script src="app.js"></script>
+  <script src="../registerJS/app.js"></script>
 </body>
 </html>

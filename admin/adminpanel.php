@@ -23,7 +23,7 @@ startSecureSession();
       <p class="text-muted">Use the secure admin section to manage users and operations.</p>
       <div class="d-flex gap-2 flex-wrap mt-4">
         <a href="users.php" class="btn btn-success">Manage Users</a>
-        <a href="../dashboard.php" class="btn btn-outline-secondary">Back to dashboard</a>
+        <a href="../php/dashboard.php" class="btn btn-outline-secondary">Back to dashboard</a>
       </div>
     </div>
   </div>

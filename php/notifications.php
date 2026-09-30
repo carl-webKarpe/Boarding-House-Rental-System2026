@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/security/security_headers.php';
-require_once __DIR__ . '/security/session.php';
-require_once __DIR__ . '/security/sanitize.php';
+require_once __DIR__ . '/../security/security_headers.php';
+require_once __DIR__ . '/../security/session.php';
+require_once __DIR__ . '/../security/sanitize.php';
 
 applySecurityHeaders();
 startSecureSession();
@@ -39,7 +39,7 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
       }
     };
   </script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="min-h-screen bg-slate-50 font-body text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
   <button id="darkModeToggle" type="button" class="fixed right-4 top-4 z-50 grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-soft backdrop-blur transition hover:scale-105 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-100" aria-label="Toggle dark mode">
@@ -147,6 +147,6 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
     </div>
   </main>
 
-  <script src="app.js"></script>
+  <script src="../registerJS/app.js"></script>
 </body>
 </html>

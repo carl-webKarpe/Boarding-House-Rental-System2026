@@ -30,7 +30,7 @@ function requireLogin(): void {
     startSecureSession();
     if (empty($_SESSION['user_id'])) {
         http_response_code(302);
-        header('Location: /loginform.html');
+        header('Location: ../html/loginform.html');
         exit;
     }
 }

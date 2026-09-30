@@ -102,7 +102,7 @@ function validateTerms(checked) {
  * ---------------------------------------------------------------------- */
 async function getCsrfToken() {
   try {
-    const response = await fetch("api/csrf.php", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    const response = await fetch("../api/csrf.php", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
     const data = await response.json();
     return data.csrf_token || "";
   } catch (error) {
@@ -282,7 +282,7 @@ function initSignupForm() {
         return;
       }
 
-      const response = await fetch("api/register.php", {
+      const response = await fetch("../api/register.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -317,7 +317,7 @@ function initSignupForm() {
       usernameTakenCheck = "";
 
       setTimeout(() => {
-        window.location.href = "loginform.html";
+        window.location.href = "../html/loginform.html";
       }, 1600);
     } catch (error) {
       registerSpinner.classList.add("hidden");

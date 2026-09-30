@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/security/security_headers.php';
-require_once __DIR__ . '/security/session.php';
-require_once __DIR__ . '/security/sanitize.php';
+require_once __DIR__ . '/../security/security_headers.php';
+require_once __DIR__ . '/../security/session.php';
+require_once __DIR__ . '/../security/sanitize.php';
 
 applySecurityHeaders();
 requireLogin();
@@ -37,7 +37,7 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'user');
       <div class="mt-4 d-flex flex-wrap gap-2">
         <a href="browse-rooms.php" class="btn btn-outline-primary">Browse Rooms</a>
         <?php if (in_array($role, ['super_admin', 'admin'], true)): ?>
-          <a href="admin/adminpanel.php" class="btn btn-outline-success">Open Admin Panel</a>
+          <a href="../admin/adminpanel.php" class="btn btn-outline-success">Open Admin Panel</a>
         <?php endif; ?>
       </div>
     </div>

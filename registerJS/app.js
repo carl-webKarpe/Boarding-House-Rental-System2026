@@ -216,7 +216,7 @@ function initFileUpload({ dropzoneId, inputId, previewId, errorId, maxSizeMB = 5
 
 async function getCsrfToken() {
   try {
-    const response = await fetch("api/csrf.php", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
+    const response = await fetch("../api/csrf.php", { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } });
     const data = await response.json();
     return data.csrf_token || "";
   } catch (error) {
@@ -291,7 +291,7 @@ function initLoginForm() {
         return;
       }
 
-      const response = await fetch("api/login.php", {
+      const response = await fetch("../api/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -318,7 +318,7 @@ function initLoginForm() {
       }
       runValidation();
       setTimeout(() => {
-        window.location.href = "browse-rooms.php";
+        window.location.href = "../php/browse-rooms.php";
       }, 1000);
     } catch (error) {
       loginSpinner.classList.add("hidden");
@@ -453,7 +453,7 @@ function initHomepageExperience() {
       loadMoreBtn.disabled = true;
       loadMoreBtn.textContent = "Loading...";
       try {
-        const response = await fetch("api/rooms.php?offset=3&limit=2", { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const response = await fetch("../api/rooms.php?offset=3&limit=2", { headers: { "X-Requested-With": "XMLHttpRequest" } });
         const data = await response.json();
         if (data.rooms && data.rooms.length) {
           const fragment = document.createDocumentFragment();

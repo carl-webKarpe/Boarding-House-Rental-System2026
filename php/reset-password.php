@@ -1,13 +1,13 @@
 <?php
-require_once __DIR__ . '/security/security_headers.php';
-require_once __DIR__ . '/security/config.php';
-require_once __DIR__ . '/security/database.php';
-require_once __DIR__ . '/security/session.php';
-require_once __DIR__ . '/security/sanitize.php';
-require_once __DIR__ . '/security/validation.php';
-require_once __DIR__ . '/security/csrf.php';
-require_once __DIR__ . '/security/auth.php';
-require_once __DIR__ . '/security/audit_log.php';
+require_once __DIR__ . '/../security/security_headers.php';
+require_once __DIR__ . '/../security/config.php';
+require_once __DIR__ . '/../security/database.php';
+require_once __DIR__ . '/../security/session.php';
+require_once __DIR__ . '/../security/sanitize.php';
+require_once __DIR__ . '/../security/validation.php';
+require_once __DIR__ . '/../security/csrf.php';
+require_once __DIR__ . '/../security/auth.php';
+require_once __DIR__ . '/../security/audit_log.php';
 
 applySecurityHeaders();
 startSecureSession();
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn btn-teal w-100 rounded-pill py-2">Reset password</button>
           </form>
           <div class="mt-3 text-center">
-            <a href="loginform.html" class="text-decoration-none fw-semibold">Back to login</a>
+            <a href="../html/loginform.html" class="text-decoration-none fw-semibold">Back to login</a>
           </div>
         </div>
       </div>
