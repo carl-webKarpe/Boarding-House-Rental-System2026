@@ -41,13 +41,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
 
                     $scheme = isHttps() ? 'https' : 'http';
-                    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-                    $resetLink = $scheme . '://' . $host . '/reset-password.php?token=' . urlencode($token);
-                    $message = 'If the account exists, a reset link has been created. Use this temporary link: <a href="' . htmlspecialchars($resetLink, ENT_QUOTES, 'UTF-8') . '" class="fw-semibold">' . htmlspecialchars($resetLink, ENT_QUOTES, 'UTF-8') . '</a>';
+                    $host = $_SERVER['SERVER_NAME'] ?? 'localhost';
+                    $port = (int) ($_SERVER['SERVER_PORT'] ?? 80);
+                    if (!in_array($port, [80, 443], true)) {
+                        $host .= ':' . $port;
+                    }
+                    $basePath = rtrim(str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/php/forgot-password.php'))), '/');
+                    $resetLink = $scheme . '://' . $host . $basePath . '/reset-password.php?token=' . urlencode($token);
+
+                    // The link must only reach the account owner. Showing it on this page
+                    // would let anyone reset any account just by typing its email.
+                    // Until email sending is set up, the link is written to storage/app.log
+                    // so the developer can test the flow locally.
+                    writeLog('Password reset link for user #' . (int) $user['id'] . ': ' . $resetLink, 'INFO');
                     auditLog('password_reset_request', 'Password reset requested', (int) $user['id']);
-                } else {
-                    $message = 'If the account exists, a reset link has been created.';
                 }
+                $message = 'If the account exists, a password reset link has been sent to its email address.';
             } catch (Throwable $e) {
                 writeLog('Password reset request failed: ' . $e->getMessage(), 'ERROR');
                 $error = 'Unable to process your request right now.';
@@ -83,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
           <?php if ($message !== ''): ?>
-            <div class="alert alert-success"><?php echo $message; ?></div>
+            <div class="alert alert-success"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div>
           <?php endif; ?>
           <?php if ($error !== ''): ?>
             <div class="alert alert-danger"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>

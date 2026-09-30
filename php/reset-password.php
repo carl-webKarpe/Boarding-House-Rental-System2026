@@ -46,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!changePassword($userId, $password)) {
                             $error = 'Password could not be updated.';
                         } else {
-                            $pdo->prepare('UPDATE password_resets SET used_at = NOW() WHERE token = :token')->execute([':token' => $tokenHash]);
+                            $pdo->prepare('UPDATE password_resets SET used_at = NOW() WHERE user_id = :user_id AND used_at IS NULL')->execute([':user_id' => $userId]);
+                            $pdo->prepare('UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = :id')->execute([':id' => $userId]);
                             auditLog('password_reset', 'Password reset completed', $userId);
                             $message = 'Your password has been reset successfully. You can now log in.';
                         }

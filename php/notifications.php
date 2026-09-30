@@ -141,7 +141,7 @@ $role = sanitizeForOutput($_SESSION['role'] ?? 'tenant');
         <section class="rounded-[28px] border border-slate-200 bg-white/90 p-5 shadow-soft dark:border-slate-800 dark:bg-slate-900/80">
           <h2 class="font-display text-lg font-semibold text-slate-900 dark:text-white">Need help?</h2>
           <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Contact support if you want personalized alerts or booking assistance.</p>
-          <a href="contact.html" class="mt-4 inline-flex w-full items-center justify-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">Contact support</a>
+          <a href="../html/index.html#footer" class="mt-4 inline-flex w-full items-center justify-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">Contact support</a>
         </section>
       </aside>
     </div>

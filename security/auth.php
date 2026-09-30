@@ -62,12 +62,9 @@ function loginUser(string $email, string $password, bool $rememberMe = false): a
         $_SESSION['role'] = (string) $user['role'];
         $_SESSION['is_logged_in'] = true;
 
-        if ($rememberMe) {
-            $expire = time() + 60 * 60 * 24 * 30;
-            setcookie('remember_me', base64_encode((string) $user['email']), $expire, '/', '', isHttps(), true);
-        } else {
-            setcookie('remember_me', '', time() - 3600, '/', '', isHttps(), true);
-        }
+        // "Remember me" only pre-fills the email on the client; clear the old
+        // insecure cookie that stored the email in plain base64.
+        setcookie('remember_me', '', time() - 3600, '/', '', isHttps(), true);
 
         auditLog('login', 'User logged in', (int) $user['id']);
 

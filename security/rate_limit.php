@@ -26,7 +26,7 @@ function checkRateLimit(string $scope, string $identifier, int $maxAttempts, int
     }
 
     $data['attempts'] = (int) ($data['attempts'] ?? 0) + 1;
-    $data['window_start'] = $now;
+    $data['window_start'] = (int) ($data['window_start'] ?? $now);
     @file_put_contents($file, json_encode($data));
     return true;
 }
@@ -56,7 +56,12 @@ function recordFailedLogin(string $email): void {
             return;
         }
 
-        $newAttempts = (int) $user['failed_login_attempts'] + 1;
+        $previousAttempts = (int) $user['failed_login_attempts'];
+        if (!empty($user['locked_until']) && strtotime((string) $user['locked_until']) <= time()) {
+            // The previous lock has expired, so start counting again.
+            $previousAttempts = 0;
+        }
+        $newAttempts = $previousAttempts + 1;
         $lockedUntil = null;
         if ($newAttempts >= BH_MAX_LOGIN_ATTEMPTS) {
             $lockedUntil = (new DateTimeImmutable('+' . BH_LOCKOUT_MINUTES . ' minutes'))->format('Y-m-d H:i:s');

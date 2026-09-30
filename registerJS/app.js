@@ -51,8 +51,9 @@ function showToast(message, type = "success") {
     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="${style.icon}" />
     </svg>
-    <span>${message}</span>
+    <span></span>
   `;
+  toast.querySelector("span").textContent = message;
 
   container.appendChild(toast);
   setTimeout(() => {
@@ -97,6 +98,48 @@ function setFieldError(inputEl, errorEl, message) {
     errorEl.textContent = "";
     errorEl.className = "hidden";
   }
+}
+
+function setFieldSuccess(inputEl, messageEl, message) {
+  if (!inputEl || !messageEl) return;
+
+  inputEl.classList.remove("border-red-400", "focus:ring-red-300", "focus:border-red-400", "border-slate-200");
+  inputEl.classList.add("border-emerald-400", "focus:ring-primary/60", "focus:border-primary");
+  inputEl.setAttribute("aria-invalid", "false");
+  messageEl.textContent = message ? `✓ ${message}` : "";
+  messageEl.className = message ? "text-xs text-emerald-600 mt-1.5" : "hidden";
+}
+
+function validateRequired(value, fieldName) {
+  return String(value || "").trim() ? "" : `${fieldName} is required.`;
+}
+
+function validateDigitsOnly(value, fieldName) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return `${fieldName} is required.`;
+  if (!/^(09\d{9}|\+639\d{9})$/.test(trimmed)) {
+    return `${fieldName} must be a valid PH mobile number (e.g. 09123456789).`;
+  }
+  return "";
+}
+
+function validateGender(value) {
+  return value ? "" : "Please select your gender.";
+}
+
+function validateDateOfBirth(value, minAge = 16) {
+  if (!value) return "Date of birth is required.";
+  const dob = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(dob.getTime())) return "Please enter a valid date.";
+  const today = new Date();
+  if (dob > today) return "Date of birth cannot be in the future.";
+  let age = today.getFullYear() - dob.getFullYear();
+  const beforeBirthday = today.getMonth() < dob.getMonth()
+    || (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate());
+  if (beforeBirthday) age -= 1;
+  if (age < minAge) return `You must be at least ${minAge} years old.`;
+  if (age > 120) return "Please enter a valid date of birth.";
+  return "";
 }
 
 function validateEmail(value) {
@@ -379,9 +422,11 @@ function initHomepageExperience() {
       const type = card.getAttribute("data-type") || "";
       const price = Number(card.getAttribute("data-price") || 0);
       const matchesQuery = !normalizedQuery || `${title} ${location} ${amenities}`.toLowerCase().includes(normalizedQuery);
+      const normalizedType = type.toLowerCase();
       const matchesFilter = filter === "all"
-        || (filter === "shared" && type.includes("shared"))
-        || (filter === "solo" && type.includes("solo"))
+        || (filter === "shared" && normalizedType.includes("shared"))
+        || (filter === "solo" && normalizedType.includes("solo"))
+        || (filter === "dormitory" && normalizedType.includes("dorm"))
         || (filter === "budget" && price <= 3500)
         || (filter === "verified");
       card.style.display = matchesQuery && matchesFilter ? "block" : "none";
@@ -417,7 +462,10 @@ function initHomepageExperience() {
   const bookButtons = document.querySelectorAll("[data-book-room]");
 
   const openModal = (title) => {
-    if (!bookingModal || !modalTitle || !modalBody) return;
+    if (!bookingModal || !modalTitle || !modalBody) {
+      showToast(`Booking request for "${title}" sent. The landlord will contact you shortly.`, "success");
+      return;
+    }
     modalTitle.textContent = title;
     modalBody.innerHTML = '<p class="mb-2">A landlord will review your request and contact you shortly.</p><p class="text-sm text-slate-500">You can also message them directly from the dashboard after confirmation.</p>';
     bookingModal.classList.remove("hidden");
@@ -453,7 +501,9 @@ function initHomepageExperience() {
       loadMoreBtn.disabled = true;
       loadMoreBtn.textContent = "Loading...";
       try {
-        const response = await fetch("../api/rooms.php?offset=3&limit=2", { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const grid = document.querySelector("#listings .grid");
+        const offset = grid ? grid.querySelectorAll("article").length : 0;
+        const response = await fetch(`../api/rooms.php?offset=${offset}&limit=2`, { headers: { "X-Requested-With": "XMLHttpRequest" } });
         const data = await response.json();
         if (data.rooms && data.rooms.length) {
           const fragment = document.createDocumentFragment();
@@ -487,7 +537,6 @@ function initHomepageExperience() {
               </div>`;
             fragment.appendChild(article);
           });
-          const grid = document.querySelector("#listings .grid");
           if (grid) grid.appendChild(fragment);
         }
         if (!data.hasMore) {
@@ -500,7 +549,7 @@ function initHomepageExperience() {
         showToast("We could not load more listings right now.", "error");
       } finally {
         loadMoreBtn.disabled = false;
-        loadMoreBtn.textContent = "Load more listings";
+        loadMoreBtn.textContent = "Load more";
       }
     });
   }

@@ -51,17 +51,9 @@ function isHttps(): bool {
 }
 
 function getClientIp(): string {
-    foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $key) {
-        if (!empty($_SERVER[$key])) {
-            $value = (string) $_SERVER[$key];
-            if (str_contains($value, ',')) {
-                $value = trim(explode(',', $value)[0]);
-            }
-            return $value;
-        }
-    }
-
-    return '127.0.0.1';
+    // Only REMOTE_ADDR is trustworthy; X-Forwarded-For and similar headers are
+    // set by the client and would let attackers bypass login rate limiting.
+    return !empty($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
 }
 
 function writeLog(string $message, string $level = 'INFO'): void {
