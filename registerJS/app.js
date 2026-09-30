@@ -361,7 +361,7 @@ function initLoginForm() {
       }
       runValidation();
       setTimeout(() => {
-        window.location.href = "../php/browse-rooms.php";
+        window.location.href = data.redirect || "../php/browse-rooms.php";
       }, 1000);
     } catch (error) {
       loginSpinner.classList.add("hidden");
@@ -555,8 +555,19 @@ function initHomepageExperience() {
   }
 }
 
+function initPhotoGallery() {
+  const mainPhoto = document.getElementById("mainPhoto");
+  if (!mainPhoto) return;
+  document.querySelectorAll("[data-photo]").forEach((thumb) => {
+    thumb.addEventListener("click", () => {
+      mainPhoto.src = thumb.getAttribute("data-photo");
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initDarkMode();
+  initPhotoGallery();
   initPasswordToggle("togglePassword", "password", "eyeOpen", "eyeClosed");
   initLoginForm();
   initHomepageExperience();

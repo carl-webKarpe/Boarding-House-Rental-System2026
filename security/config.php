@@ -10,15 +10,18 @@ if (!defined('BH_SYSTEM_SECURITY_DIR')) {
     define('BH_SYSTEM_SECURITY_DIR', __DIR__);
 }
 
+require_once __DIR__ . '/env.php';
+loadEnvFile(BH_SYSTEM_ROOT . '/.env');
+
 /**
- * Database configuration.
- * These values are intentionally simple for local development and can be moved
- * to a file outside the web root in production.
+ * Database configuration. Set these in the .env file in the project root
+ * (copy .env.example to .env) so each developer can use their own password.
  */
-define('BH_DB_HOST', '127.0.0.1');
-define('BH_DB_NAME', 'bhsystem');
-define('BH_DB_USER', 'root');
-define('BH_DB_PASS', '');
+define('BH_DB_HOST', env('DB_HOST', '127.0.0.1'));
+define('BH_DB_PORT', env('DB_PORT', '3306'));
+define('BH_DB_NAME', env('DB_NAME', 'bhsystem'));
+define('BH_DB_USER', env('DB_USER', 'root'));
+define('BH_DB_PASS', env('DB_PASS', ''));
 define('BH_DB_CHARSET', 'utf8mb4');
 
 /**
@@ -29,7 +32,9 @@ define('BH_SESSION_NAME', 'BHSESSID');
 define('BH_LOG_FILE', BH_SYSTEM_ROOT . '/storage/app.log');
 define('BH_RATE_LIMIT_FILE_DIR', BH_SYSTEM_ROOT . '/storage');
 define('BH_UPLOAD_DIR', BH_SYSTEM_ROOT . '/uploads');
-define('BH_UPLOAD_URL', '/uploads');
+define('BH_UPLOAD_URL', 'uploads');
+// Identity documents are private: stored under storage/, which is never served.
+define('BH_DOCUMENT_DIR', BH_SYSTEM_ROOT . '/storage/documents');
 
 define('BH_PASSWORD_MIN_LENGTH', 8);
 

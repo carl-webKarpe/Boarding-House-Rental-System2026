@@ -24,12 +24,14 @@ if (!verifyCsrfToken((string) $csrfToken)) {
     exit;
 }
 
-$result = registerUser([
-    'role' => 'landlord',
-    'email' => (string) ($input['gmail'] ?? $input['email'] ?? ''),
-    'username' => (string) ($input['username'] ?? ''),
-    'password' => (string) ($input['password'] ?? ''),
-    'confirmPassword' => (string) ($input['confirmPassword'] ?? ''),
+$input['role'] = 'landlord';
+$input['email'] = (string) ($input['gmail'] ?? $input['email'] ?? '');
+
+$result = registerUser($input, [
+    'government_id' => $_FILES['govIdFile'] ?? [],
+    'selfie' => $_FILES['selfieFile'] ?? [],
+    'business_permit' => $_FILES['permitFile'] ?? [],
+    'proof_of_ownership' => $_FILES['ownershipFile'] ?? [],
 ]);
 
 echo json_encode($result);

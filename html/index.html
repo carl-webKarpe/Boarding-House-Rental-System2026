@@ -31,6 +31,7 @@
       <a href="#top" class="navlink is-active">Home</a>
       <a href="#listings" class="navlink">Boarding Houses</a>
       <a href="#siit-map" class="navlink">Near SIIT</a>
+      <a href="../php/browse-rooms.php" class="navlink">Browse All Rooms</a>
       <a href="#how-it-works" class="navlink">How It Works</a>
       <a href="#about" class="navlink">About Us</a>
       <a href="#footer" class="navlink">Contact</a>
@@ -127,9 +128,10 @@
           <label for="fType">Room Type</label>
           <select id="fType">
             <option value="">Any type</option>
-            <option value="Single Room">Single Room</option>
+            <option value="Solo Room">Solo Room</option>
             <option value="Shared Room">Shared Room</option>
-            <option value="Bedspace">Bedspace</option>
+            <option value="Dormitory">Dormitory / Bedspace</option>
+            <option value="Family Room">Family Room</option>
           </select>
         </div>
         <div class="search-field">
@@ -137,7 +139,7 @@
           <select id="fAvailability">
             <option value="">Any status</option>
             <option value="Available">Available Now</option>
-            <option value="Coming Soon">Coming Soon</option>
+            <option value="Full">Full</option>
           </select>
         </div>
         <button type="submit" class="btn btn--dark search-form__submit">Search Rooms</button>

@@ -16,6 +16,7 @@ function startSecureSession(): void {
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
+        ini_set('session.use_strict_mode', '1');
         session_start();
     }
 }

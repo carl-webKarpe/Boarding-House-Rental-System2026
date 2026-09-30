@@ -24,12 +24,9 @@ if (!verifyCsrfToken((string) $csrfToken)) {
     exit;
 }
 
-$result = registerUser([
-    'role' => 'tenant',
-    'email' => (string) ($input['gmail'] ?? $input['email'] ?? ''),
-    'username' => (string) ($input['username'] ?? ''),
-    'password' => (string) ($input['password'] ?? ''),
-    'confirmPassword' => (string) ($input['confirmPassword'] ?? ''),
-]);
+$input['role'] = 'tenant';
+$input['email'] = (string) ($input['gmail'] ?? $input['email'] ?? '');
+
+$result = registerUser($input, ['id' => $_FILES['idFile'] ?? []]);
 
 echo json_encode($result);

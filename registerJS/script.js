@@ -20,14 +20,16 @@ const SIIT = {
 };
 
 /* ---------------------------------------------------------------------- *
- * Sample listings data — replace with real data from the database later.
+ * Fallback sample listings. On page load, real listings are fetched from
+ * ../api/rooms.php (see loadListingsFromDatabase); these samples are only
+ * shown when the database cannot be reached.
  * NOTE ON COORDINATES: these are placeholder sample coordinates chosen to
  * sit a realistic distance from SIIT for this prototype. In production,
  * `coordinates` should come from the property's saved location record —
  * set once by the landlord/admin via a map location-picker when the
  * listing is created — not hard-coded here.
  * ---------------------------------------------------------------------- */
-const LISTINGS = [
+let LISTINGS = [
   {
     id: "greenview",
     name: "Green View Boarding House",
@@ -131,9 +133,65 @@ function directionsUrl(item) {
 }
 
 // Pre-compute each listing's distance from SIIT once, up front.
-LISTINGS.forEach((item) => {
-  item.distanceToSIIT = distanceMeters(SIIT.coordinates, item.coordinates);
-});
+function computeDistances() {
+  LISTINGS.forEach((item) => {
+    item.distanceToSIIT = distanceMeters(SIIT.coordinates, item.coordinates);
+  });
+}
+computeDistances();
+
+/** Escape text before putting it into HTML (listing text comes from landlords). */
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/**
+ * Replaces the sample LISTINGS with real rooms from the database. Rooms are
+ * grouped per boarding house (cheapest room shown). Houses without map
+ * coordinates are skipped here; they still appear on the Browse Rooms page.
+ */
+async function loadListingsFromDatabase() {
+  try {
+    const response = await fetch("../api/rooms.php?limit=20", { headers: { Accept: "application/json" } });
+    if (!response.ok) return false;
+    const data = await response.json();
+    if (!Array.isArray(data.rooms) || data.rooms.length === 0) return false;
+
+    const houses = new Map();
+    data.rooms.forEach((room) => {
+      if (room.latitude === null || room.longitude === null) return;
+      const key = String(room.houseId);
+      const existing = houses.get(key);
+      if (existing) {
+        existing.rooms += room.availableSlots;
+        if (room.rent < existing.price) {
+          Object.assign(existing, { price: room.rent, roomType: room.type, url: room.url, img: room.image });
+        }
+        return;
+      }
+      houses.set(key, {
+        id: key,
+        name: room.house,
+        location: `${room.barangay}, ${room.city}`,
+        price: room.rent,
+        roomType: room.type,
+        availability: room.availableSlots > 0 ? "Available" : "Full",
+        rooms: room.availableSlots,
+        amenities: room.amenities.slice(0, 4),
+        coordinates: [room.latitude, room.longitude],
+        img: room.image,
+        url: room.url,
+      });
+    });
+
+    if (houses.size === 0) return false;
+    LISTINGS = [...houses.values()].map((item) => ({ ...item, availability: item.rooms > 0 ? "Available" : "Full" }));
+    computeDistances();
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 function byDistance(a, b) {
   return a.distanceToSIIT - b.distanceToSIIT;
@@ -149,19 +207,19 @@ function currency(amount) {
 function listingCardHTML(item) {
   const badgeClass = item.availability === "Available" ? "" : " listing-card__badge--soon";
   return `
-    <article class="listing-card reveal is-visible" data-id="${item.id}">
+    <article class="listing-card reveal is-visible" data-id="${esc(item.id)}">
       <div class="listing-card__img-wrap">
-        <img class="listing-card__img" src="${item.img}" alt="${item.name}" loading="lazy" />
-        <span class="listing-card__badge${badgeClass}">${item.availability}</span>
+        <img class="listing-card__img" src="${esc(item.img)}" alt="${esc(item.name)}" loading="lazy" />
+        <span class="listing-card__badge${badgeClass}">${esc(item.availability)}</span>
       </div>
       <div class="listing-card__body">
-        <h3>${item.name}</h3>
-        <span class="listing-card__loc">${item.location}</span>
+        <h3>${esc(item.name)}</h3>
+        <span class="listing-card__loc">${esc(item.location)}</span>
         <span class="listing-card__price">${currency(item.price)} <span>/ month</span></span>
-        <span class="listing-card__meta">${item.roomType} &middot; ${item.rooms} rooms available</span>
+        <span class="listing-card__meta">${esc(item.roomType)} &middot; ${Number(item.rooms)} rooms available</span>
         <span class="listing-card__distance">\u{1F4CD} ${formatDistance(item.distanceToSIIT)} from SIIT</span>
-        <span class="listing-card__amenities">${item.amenities.join(" \u2022 ")}</span>
-        <button type="button" class="listing-card__cta" data-view="${item.id}">View Details</button>
+        <span class="listing-card__amenities">${item.amenities.map(esc).join(" \u2022 ")}</span>
+        <button type="button" class="listing-card__cta" data-view="${esc(item.id)}">View Details</button>
       </div>
     </article>
   `;
@@ -216,16 +274,16 @@ function openListingModal(id) {
   const body = document.getElementById("modalBody");
 
   const badgeClass = item.availability === "Available" ? "" : " listing-card__badge--soon";
-  const amenitiesHTML = item.amenities.map((a) => `<li>${a}</li>`).join("");
+  const amenitiesHTML = item.amenities.map((a) => `<li>${esc(a)}</li>`).join("");
 
   body.innerHTML = `
     <div class="modal__media">
-      <img src="${item.img}" alt="${item.name}" />
-      <span class="listing-card__badge${badgeClass}">${item.availability}</span>
+      <img src="${esc(item.img)}" alt="${esc(item.name)}" />
+      <span class="listing-card__badge${badgeClass}">${esc(item.availability)}</span>
     </div>
     <div class="modal__content">
-      <h3 id="modalTitle">${item.name}</h3>
-      <span class="listing-card__loc">${item.location}</span>
+      <h3 id="modalTitle">${esc(item.name)}</h3>
+      <span class="listing-card__loc">${esc(item.location)}</span>
 
       <div class="modal__location">
         <div class="modal__location-heading">
@@ -235,22 +293,22 @@ function openListingModal(id) {
           </div>
           <a href="${directionsUrl(item)}" target="_blank" rel="noopener" class="modal__map-link">Get Directions</a>
         </div>
-        <div id="roomMap" class="room-map" aria-label="Map showing ${item.name} near SIIT"></div>
+        <div id="roomMap" class="room-map" aria-label="Map showing ${esc(item.name)} near SIIT"></div>
       </div>
 
       <div class="modal__price-row">
         <span class="listing-card__price">${currency(item.price)} <span>/ month</span></span>
-        <span class="modal__roomtype">${item.roomType}</span>
+        <span class="modal__roomtype">${esc(item.roomType)}</span>
       </div>
 
       <div class="modal__details-grid">
         <div class="modal__detail">
           <span class="modal__detail-label">Rooms Open</span>
-          <span class="modal__detail-value">${item.rooms}</span>
+          <span class="modal__detail-value">${Number(item.rooms)}</span>
         </div>
         <div class="modal__detail">
           <span class="modal__detail-label">Availability</span>
-          <span class="modal__detail-value">${item.availability}</span>
+          <span class="modal__detail-value">${esc(item.availability)}</span>
         </div>
       </div>
 
@@ -259,7 +317,7 @@ function openListingModal(id) {
         <ul class="modal__amenity-list">${amenitiesHTML}</ul>
       </div>
 
-      <a href="../html/loginform.html" class="btn btn--dark modal__cta">Reserve This Room</a>
+      <a href="${esc(item.url || "../html/loginform.html")}" class="btn btn--dark modal__cta">${item.url ? "View Room &amp; Book" : "Reserve This Room"}</a>
     </div>
   `;
 
@@ -274,7 +332,7 @@ function openListingModal(id) {
     }).addTo(map);
     L.marker(item.coordinates, { icon: propertyIcon() })
       .addTo(map)
-      .bindPopup(`<strong>${item.name}</strong><br>${item.location}`)
+      .bindPopup(`<strong>${esc(item.name)}</strong><br>${esc(item.location)}`)
       .openPopup();
     L.marker(SIIT.coordinates, { icon: siitIcon(), zIndexOffset: 1000 })
       .addTo(map)
@@ -341,17 +399,17 @@ function visibleSiitListings() {
 
 function siitCardHTML(item) {
   return `
-    <article class="siit-card" data-id="${item.id}">
-      <img class="siit-card__img" src="${item.img}" alt="${item.name}" loading="lazy" />
+    <article class="siit-card" data-id="${esc(item.id)}">
+      <img class="siit-card__img" src="${esc(item.img)}" alt="${esc(item.name)}" loading="lazy" />
       <div class="siit-card__body">
         <div class="siit-card__top">
-          <h3>${item.name}</h3>
+          <h3>${esc(item.name)}</h3>
           <span class="siit-card__price">${currency(item.price)}<span>/mo</span></span>
         </div>
-        <span class="siit-card__loc">${item.location}</span>
-        <span class="siit-card__distance">\u{1F4CD} ${formatDistance(item.distanceToSIIT)} from SIIT &middot; ${item.roomType}</span>
+        <span class="siit-card__loc">${esc(item.location)}</span>
+        <span class="siit-card__distance">\u{1F4CD} ${formatDistance(item.distanceToSIIT)} from SIIT &middot; ${esc(item.roomType)}</span>
         <div class="siit-card__actions">
-          <button type="button" class="btn btn--outline-dark btn--sm" data-map-focus="${item.id}">View on Map</button>
+          <button type="button" class="btn btn--outline-dark btn--sm" data-map-focus="${esc(item.id)}">View on Map</button>
           <a href="${directionsUrl(item)}" target="_blank" rel="noopener" class="btn btn--dark btn--sm">Get Directions</a>
         </div>
       </div>
@@ -392,13 +450,13 @@ function focusSiitMarker(id) {
 function popupHTML(item) {
   return `
     <div class="siit-popup">
-      <strong>${item.name}</strong>
-      <span>${item.location}</span>
+      <strong>${esc(item.name)}</strong>
+      <span>${esc(item.location)}</span>
       <span>${formatDistance(item.distanceToSIIT)} from SIIT</span>
-      <span>${currency(item.price)} / month &middot; ${item.roomType}</span>
-      <span>${item.rooms} rooms available</span>
+      <span>${currency(item.price)} / month &middot; ${esc(item.roomType)}</span>
+      <span>${Number(item.rooms)} rooms available</span>
       <div class="siit-popup__actions">
-        <button type="button" class="btn btn--dark btn--sm" onclick="openListingModal('${item.id}')">View Details</button>
+        <button type="button" class="btn btn--dark btn--sm" onclick="openListingModal('${esc(item.id)}')">View Details</button>
         <a href="${directionsUrl(item)}" target="_blank" rel="noopener" class="btn btn--outline-dark btn--sm">Directions</a>
       </div>
     </div>
@@ -581,8 +639,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initScrollReveal();
   initStatCounters();
 
-  renderListings([...LISTINGS].sort(byDistance));
-  initSiitMap();
+  loadListingsFromDatabase().finally(() => {
+    renderListings([...LISTINGS].sort(byDistance));
+    initSiitMap();
+  });
 
   document.getElementById("searchForm").addEventListener("submit", (e) => {
     e.preventDefault();

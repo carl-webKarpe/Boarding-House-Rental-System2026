@@ -1,4 +1,7 @@
-# Runtime data (logs, rate-limit counters) and user uploads
+# Local settings (database password)
+.env
+
+# Runtime data (logs, rate-limit counters, private documents) and user uploads
 storage/*
 !storage/.htaccess
 uploads/

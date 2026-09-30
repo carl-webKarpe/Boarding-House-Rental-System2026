@@ -11,7 +11,7 @@ function getDb(): PDO {
         return $pdo;
     }
 
-    $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', BH_DB_HOST, BH_DB_NAME, BH_DB_CHARSET);
+    $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', BH_DB_HOST, BH_DB_PORT, BH_DB_NAME, BH_DB_CHARSET);
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -23,7 +23,12 @@ function getDb(): PDO {
     } catch (PDOException $e) {
         writeLog('Database connection failed: ' . $e->getMessage(), 'ERROR');
         http_response_code(503);
-        echo json_encode(['success' => false, 'message' => 'Service temporarily unavailable.']);
+        $message = 'Cannot connect to the database. Make sure MySQL is running and the DB_* settings in .env are correct.';
+        if (str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'text/html')) {
+            echo '<p style="font-family:sans-serif;padding:2rem">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</p>';
+        } else {
+            echo json_encode(['success' => false, 'message' => $message]);
+        }
         exit;
     }
 
